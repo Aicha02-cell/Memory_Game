@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Memory Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f2f2f2;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      grid-gap: 10px;
+      margin-top: 20px;
+    }
+
+    .card {
+      width: 100px;
+      height: 100px;
+      background: #007bff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: white;
+      cursor: pointer;
+      border-radius: 8px;
+      user-select: none;
+      transition: background 0.3s;
+    }
+
+    .card.flipped {
+      background: #fff;
+      color: #007bff;
+      cursor: default;
+    }
+
+    .card.matched {
+      background: #28a745;
+      color: white;
+      pointer-events: none;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 Memory Game</h1>
+  <div class="game-board" id="gameBoard"></div>
+  <div class="footer">Réalisé avec HTML, CSS & JavaScript</div>
+
+  <script>
+    const emojis = ['🍎', '🍌', '🍇', '🍓', '🍍', '🥝', '🍒', '🍉'];
+    const gameBoard = document.getElementById('gameBoard');
+    let cardValues = [...emojis, ...emojis]; // 16 cartes = 8 paires
+    let flippedCards = [];
+    let matchedCards = [];
+
+    // Mélanger
+    cardValues.sort(() => 0.5 - Math.random());
+
+    // Créer les cartes
+    cardValues.forEach((emoji, index) => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.dataset.emoji = emoji;
+      card.dataset.index = index;
+      card.innerText = '?';
+      gameBoard.appendChild(card);
+    });
+
+    // Gérer les clics
+    gameBoard.addEventListener('click', function (e) {
+      const clicked = e.target;
+      if (!clicked.classList.contains('card') || clicked.classList.contains('flipped') || flippedCards.length === 2) return;
+
+      clicked.innerText = clicked.dataset.emoji;
+      clicked.classList.add('flipped');
+      flippedCards.push(clicked);
+
+      if (flippedCards.length === 2) {
+        const [card1, card2] = flippedCards;
+
+        if (card1.dataset.emoji === card2.dataset.emoji) {
+          card1.classList.add('matched');
+          card2.classList.add('matched');
+          matchedCards.push(card1, card2);
+          flippedCards = [];
+          if (matchedCards.length === cardValues.length) {
+            setTimeout(() => alert("🎉 Bravo, tu as gagné !"), 300);
+          }
+        } else {
+          setTimeout(() => {
+            card1.innerText = '?';
+            card2.innerText = '?';
+            card1.classList.remove('flipped');
+            card2.classList.remove('flipped');
+            flippedCards = [];
+          }, 800);
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
